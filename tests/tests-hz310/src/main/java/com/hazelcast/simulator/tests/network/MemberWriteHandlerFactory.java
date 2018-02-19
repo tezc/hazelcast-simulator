@@ -16,12 +16,13 @@
 package com.hazelcast.simulator.tests.network;
 
 import com.hazelcast.internal.networking.ChannelOutboundHandler;
-import com.hazelcast.nio.tcp.MemberChannelOutboundHandler;
+//import com.hazelcast.nio.tcp.MemberChannelOutboundHandler;
 
 public class MemberWriteHandlerFactory implements WriteHandlerFactory {
 
     @Override
     public ChannelOutboundHandler create() {
-        return new MemberChannelOutboundHandler();
+//        return new MemberChannelOutboundHandler();
+        return null;
     }
 }

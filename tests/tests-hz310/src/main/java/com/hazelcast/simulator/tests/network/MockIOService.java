@@ -31,7 +31,7 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.IOService;
 import com.hazelcast.nio.MemberSocketInterceptor;
 import com.hazelcast.nio.Packet;
-import com.hazelcast.nio.tcp.MemberChannelInboundHandler;
+//import com.hazelcast.nio.tcp.MemberChannelInboundHandler;
 import com.hazelcast.nio.tcp.TcpIpConnection;
 import com.hazelcast.simulator.test.TestException;
 import com.hazelcast.spi.EventFilter;
@@ -275,25 +275,27 @@ public class MockIOService implements IOService {
 
     @Override
     public ChannelInboundHandler createInboundHandler(final TcpIpConnection connection) {
-        return new MemberChannelInboundHandler(connection, new PacketHandler() {
-            private ILogger logger = loggingService.getLogger("MockIOService");
+//        return new MemberChannelInboundHandler(connection, new PacketHandler() {
+//            private ILogger logger = loggingService.getLogger("MockIOService");
+//
+//            @Override
+//            public void handle(Packet packet) {
+//                try {
+//                    if (packet.getPacketType() == Packet.Type.BIND) {
+//                        connection.getConnectionManager().handle(packet);
+//                    } else {
+//                        PacketHandler handler = packetHandler;
+//                        if (handler != null) {
+//                            handler.handle(packet);
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    logger.severe(e);
+//                }
+//            }
+//        });
 
-            @Override
-            public void handle(Packet packet) {
-                try {
-                    if (packet.getPacketType() == Packet.Type.BIND) {
-                        connection.getConnectionManager().handle(packet);
-                    } else {
-                        PacketHandler handler = packetHandler;
-                        if (handler != null) {
-                            handler.handle(packet);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.severe(e);
-                }
-            }
-        });
+        return null;
     }
 
     @Override

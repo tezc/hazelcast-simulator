@@ -22,6 +22,7 @@ import com.hazelcast.logging.Logger;
 import com.hazelcast.simulator.utils.ExceptionReporter;
 import com.hazelcast.simulator.utils.ThrottlingLogger;
 
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -110,6 +111,7 @@ abstract class AbstractAsyncStreamer<K, V> implements Streamer<K, V> {
         public void onResponse(V response) {
             releasePermit(1);
             counter.incrementAndGet();
+            throttlingLogger.info("Stored " + counter.get() + " at " + new Date());
         }
 
         @Override
@@ -119,6 +121,8 @@ abstract class AbstractAsyncStreamer<K, V> implements Streamer<K, V> {
 
             releasePermit(1);
             counter.incrementAndGet();
+
+            throttlingLogger.info("Failed to store " + counter.get() + " at " + new Date());
         }
     }
 }
