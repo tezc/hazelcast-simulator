@@ -742,7 +742,7 @@ workers=$(coordinator-remote worker-start)
 
 ## Clients
 
-The following script demonstrates a basic usage of letting a test run using five clients:
+The following script demonstrates a basic usage of letting a test run using five clients:"
 
 ```
 coordinator-remote worker-start --count 1
