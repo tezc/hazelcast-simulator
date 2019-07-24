@@ -16,9 +16,7 @@
 package com.hazelcast.simulator.redisson;
 
 import com.hazelcast.simulator.test.BaseThreadState;
-import com.hazelcast.simulator.test.annotations.Prepare;
-import com.hazelcast.simulator.test.annotations.Setup;
-import com.hazelcast.simulator.test.annotations.TimeStep;
+import com.hazelcast.simulator.test.annotations.*;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RMap;
 
@@ -60,16 +58,28 @@ public class StringStringSyncTest extends RedissonTest {
         map.delete();
         System.out.println(" Global setup map size after delete : " + map.size());
 
+        map = client.getMap("map");
         Random random = new Random();
         for (int k = 0; k < keyDomain; k++) {
             int r = random.nextInt(valueCount);
             map.fastPut(Long.toString(k), values[r]);
         }
+
+        System.out.println(" Global setup map size after loading : " + map.size());
     }
 
     @TimeStep(prob = -1)
     public String get(ThreadState state) {
         return map.get(state.randomKey());
+    }
+
+    @TimeStep(prob = -1)
+    public void getTest(ThreadState state) {
+        String key = state.randomKey();
+        String s = map.get(key);
+        if (s == null) {
+            throw new RuntimeException("map returns null for key : " + key);
+        }
     }
 
     @TimeStep(prob = -1)
@@ -90,5 +100,11 @@ public class StringStringSyncTest extends RedissonTest {
         private String randomValue() {
             return values[randomInt(values.length)];
         }
+    }
+
+    @Teardown(global = true)
+    public void clear() {
+        map.clear();
+        map.delete();
     }
 }
