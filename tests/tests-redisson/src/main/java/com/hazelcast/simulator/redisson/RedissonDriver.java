@@ -69,6 +69,11 @@ public class RedissonDriver extends VendorDriver<RedissonClient> {
         }
 
         this.client = Redisson.create(config);
+
+        System.out.println("Nodes in cluster : ");
+        client.getClusterNodesGroup().getNodes().forEach(n-> {
+            System.out.println(" Addr : " + n.getAddr() + " type : " + n.getType());
+        });
     }
 
     @Override
