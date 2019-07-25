@@ -116,6 +116,18 @@ if [ "$VENDOR" = "lettuce" ]; then
     uploadLibraryJar "reactive-streams-*"
 fi
 
+# hack to get redisson working
+if [ "$VENDOR" = "redisson" ]; then
+    uploadLibraryJar "redisson-*"
+    uploadLibraryJar "netty-*"
+    uploadLibraryJar "reactor-*"
+    uploadLibraryJar "reactive-streams-*"
+    uploadLibraryJar "fst-*"
+    uploadLibraryJar "jackson-*"
+    uploadLibraryJar "jodd-*"
+    uploadLibraryJar "objenesis-*"
+fi
+
 # upload remaining files
 uploadToRemoteSimulatorDir "$SIMULATOR_HOME/bin/" "bin"
 uploadToRemoteSimulatorDir "$SIMULATOR_HOME/conf/" "conf"
