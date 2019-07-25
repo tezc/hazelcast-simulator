@@ -6,7 +6,6 @@ import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RMap;
 
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.hazelcast.simulator.utils.GeneratorUtils.generateByteArray;
 
@@ -76,11 +75,21 @@ public class ByteByteTest extends RedissonTest {
     }
 
     @TimeStep(prob = 0.1)
+    public byte[] putRecurring(ThreadState state) {
+        return map.put(state.randomRecurringKey(), state.randomValue());
+    }
+
+    @TimeStep(prob = -1)
+    public byte[] getRecurring(ThreadState state) {
+        return map.get(state.randomRecurringKey());
+    }
+
+    @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
         return map.put(state.randomKey(), state.randomValue());
     }
 
-    @TimeStep(prob = -1)
+    @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
         return map.get(state.randomKey());
     }
@@ -89,7 +98,7 @@ public class ByteByteTest extends RedissonTest {
         private int base;
         private int count;
 
-        private int randomFromSequence() {
+        private int randomRecurring() {
             if (count++ == perThreadKeys * 100) {
                 count = 0;
                 base = randomInt(keys.length);
@@ -98,8 +107,12 @@ public class ByteByteTest extends RedissonTest {
             return ((base + count) % perThreadKeys);
         }
 
+        private byte[] randomRecurringKey() {
+            return keys[randomRecurring()];
+        }
+
         private byte[] randomKey() {
-            return keys[randomFromSequence()];
+            return keys[randomInt(keys.length)];
         }
 
         private byte[] randomValue() {
