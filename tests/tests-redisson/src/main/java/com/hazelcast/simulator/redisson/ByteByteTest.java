@@ -89,13 +89,17 @@ public class ByteByteTest extends RedissonTest {
         private int base;
         private int count;
 
-        private byte[] randomKey() {
+        private int randomFromSequence() {
             if (count++ == perThreadKeys * 100) {
                 count = 0;
                 base = randomInt(keys.length);
             }
 
-            return keys[((base + count) % perThreadKeys)];
+            return ((base + count) % perThreadKeys);
+        }
+
+        private byte[] randomKey() {
+            return keys[randomFromSequence()];
         }
 
         private byte[] randomValue() {
