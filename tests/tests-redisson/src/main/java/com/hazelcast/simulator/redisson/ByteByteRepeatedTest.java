@@ -102,22 +102,43 @@ public class ByteByteRepeatedTest extends RedissonTest {
 
     @TimeStep(prob = 0)
     public byte[] putRepeated(ThreadState state) {
-        return state.map.put(state.randomRepeatedKey(), state.randomValue());
+        byte[] ret = state.map.put(state.randomRepeatedKey(), state.randomValue());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
+
     }
 
     @TimeStep(prob = 0)
     public byte[] getRepeated(ThreadState state) {
-        return state.map.get(state.randomRepeatedKey());
+        byte[] ret = state.map.get(state.randomRepeatedKey());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
-        return state.randomMap().put(state.randomKey(), state.randomValue());
+        byte[] ret = state.randomMap().put(state.randomKey(), state.randomValue());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
-        return state.randomMap().get(state.randomKey());
+        byte[] ret = state.randomMap().get(state.randomKey());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     public class ThreadState extends BaseThreadState {
@@ -130,7 +151,8 @@ public class ByteByteRepeatedTest extends RedissonTest {
 
 
         private int randomRepeated() {
-            if (count++ == perThreadRepeatedKey * 100) {
+            count++;
+            if (count == perThreadRepeatedKey * 100) {
                 count = 0;
                 currentBase = ((iteration++ * perThreadRepeatedKey) % perThreadKey) + base;
             }

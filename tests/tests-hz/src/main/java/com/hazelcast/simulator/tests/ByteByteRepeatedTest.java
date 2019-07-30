@@ -30,8 +30,8 @@ public class ByteByteRepeatedTest extends HazelcastTest {
     private byte[][] keys;
     private byte[][] values;
 
-    private IMap<byte[], byte[]>[] maps = new IMap[5];
-    private String[] mapNames = {"map", "map33", "map3", "map12", "map22"};
+    private final IMap<byte[], byte[]>[] maps = new IMap[5];
+    private final String[] mapNames = {"map", "map33", "map3", "map12", "map22"};
     private final AtomicInteger id = new AtomicInteger();
 
     @Setup
@@ -49,9 +49,8 @@ public class ByteByteRepeatedTest extends HazelcastTest {
         }
 
         for (int i = 0; i < maps.length; i++) {
-            String mapName = mapNames[i];
-            maps[i] = targetInstance.getMap(mapName);
-            System.out.println("Map name : " + mapName + ", map size " + maps[i].size());
+            maps[i] = targetInstance.getMap(mapNames[i]);
+            System.out.println("Map name : " + mapNames[i] + ", map size " + maps[i].size());
         }
     }
 
@@ -69,6 +68,10 @@ public class ByteByteRepeatedTest extends HazelcastTest {
                 streamer.pushEntry(key, values[random.nextInt(values.length)]);
             }
             streamer.await();
+        }
+
+        for (IMap<byte[], byte[]> map : maps) {
+            System.out.println("Total map size " + map.size());
         }
     }
 
@@ -101,12 +104,22 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
     @TimeStep(prob = 0)
     public byte[] putRepeated(ThreadState state) {
-        return state.map.put(state.randomRepeatedKey(), state.randomValue());
+        byte[] ret = state.map.put(state.randomRepeatedKey(), state.randomValue());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     @TimeStep(prob = 0)
     public byte[] getRepeated(ThreadState state) {
-        return state.map.get(state.randomRepeatedKey());
+        byte[] ret = state.map.get(state.randomRepeatedKey());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     @TimeStep(prob = 0)
@@ -139,7 +152,8 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
 
         private int randomRepeated() {
-            if (count++ == perThreadRepeatedKey * 100) {
+            count++;
+            if (count == perThreadRepeatedKey * 100) {
                 count = 0;
                 currentBase = ((iteration++ * perThreadRepeatedKey) % perThreadKey) + base;
             }
