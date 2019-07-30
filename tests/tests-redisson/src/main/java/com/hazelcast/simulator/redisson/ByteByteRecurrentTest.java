@@ -158,7 +158,7 @@ public class ByteByteRecurrentTest extends RedissonTest {
     @Teardown (global = true)
     public void tearDown() {
         for (RMap map : maps) {
-            map.delete();
+            map.deleteAsync();
         }
     }
 
