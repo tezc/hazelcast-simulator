@@ -78,6 +78,12 @@ public class ByteByteRepeatedTest extends HazelcastTest {
             System.out.println("Total map size " + map.size());
         }
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         for (IMap<byte[], byte[]> map : maps) {
             System.out.println("Total map size " + map.size());
         }
@@ -105,12 +111,22 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
     @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
-        return state.randomMap().put(state.randomKey(), state.randomValue());
+        byte[] ret = state.randomMap().put(state.randomKey(), state.randomValue());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
-        return state.randomMap().get(state.randomKey());
+        byte[] ret = state.randomMap().get(state.randomKey());
+        if (ret == null) {
+            throw new RuntimeException("Null return");
+        }
+
+        return ret;
     }
 
     public class ThreadState extends BaseThreadState {
