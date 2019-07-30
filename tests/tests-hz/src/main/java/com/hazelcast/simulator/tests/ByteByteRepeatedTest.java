@@ -94,7 +94,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
     @BeforeRun
     public void beforeRun(ThreadState state) {
-        state.id = id.incrementAndGet();
+        state.id = id.getAndIncrement();
         state.map = maps[state.id % maps.length];
         state.base = (state.id / maps.length) * perThreadKey;
         state.currentBase = state.base;
