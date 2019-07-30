@@ -2,6 +2,7 @@ package com.hazelcast.simulator.tests;
 
 
 import com.hazelcast.core.IMap;
+import com.hazelcast.monitor.NearCacheStats;
 import com.hazelcast.simulator.hz.HazelcastTest;
 import com.hazelcast.simulator.test.BaseThreadState;
 import com.hazelcast.simulator.test.annotations.*;
@@ -140,6 +141,16 @@ public class ByteByteRecurrentTest extends HazelcastTest {
 
         private IMap<byte[], byte[]> randomMap() {
             return maps[randomInt(maps.length)];
+        }
+    }
+
+    @Verify
+    public void printStats() {
+        for (IMap map : maps) {
+            NearCacheStats stats = map.getLocalMapStats().getNearCacheStats();
+            if (stats != null) {
+                System.out.println("Hit ratio : " + stats.getRatio());
+            }
         }
     }
 
