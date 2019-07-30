@@ -97,7 +97,7 @@ public class ByteByteRecurrentTest extends RedissonTest {
         state.base = (state.id / maps.length) * perThreadKey;
         state.currentBase = state.base;
 
-        System.out.println("Thread " + state.map.getName() + ", inverval [" + state.base + "," + state.base + perThreadKey + "]");
+        System.out.println("Thread " + state.map.getName() + ", inverval [" + (state.base + "," + state.base + perThreadKey) + "]");
     }
 
     @TimeStep(prob = 0)
