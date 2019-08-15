@@ -156,7 +156,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
             if (count == perThreadRepeatedKey * 100) {
                 count = 0;
                 iteration++;
-                currentBase = ((iteration * perThreadRepeatedKey) % perThreadKey) + base;
+                currentBase = ((iteration * perThreadRepeatedKey / 2) % perThreadKey) + base;
                 System.out.println("Current base : " + currentBase);
             }
 
@@ -183,7 +183,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
         }
     }
 
-    @Verify
+    @Verify (global = false)
     public void printStats() {
         for (IMap map : maps) {
             NearCacheStats stats = map.getLocalMapStats().getNearCacheStats();

@@ -24,7 +24,7 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
     public int repeatedKeyCount;
     public int threadCount = 10;
 
-    
+
     private int perThreadRepeatedKey;
     private byte[][] keys;
     private byte[][] values;
