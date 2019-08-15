@@ -36,7 +36,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
     @Setup
     public void setUp() {
-        perThreadKey = keyCount / threadCount;
+        perThreadKey = keyCount / threadCount / maps.length;
         System.out.println("perThreadKey " + perThreadKey);
 
         perThreadRepeatedKey = repeatedKeyCount / threadCount;
