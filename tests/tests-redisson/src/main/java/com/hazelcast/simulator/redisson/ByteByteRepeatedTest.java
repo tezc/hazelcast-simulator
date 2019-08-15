@@ -34,7 +34,7 @@ public class ByteByteRepeatedTest extends RedissonTest {
 
     @Setup
     public void setUp() {
-        perThreadKey = keyCount / threadCount /maps.length;
+        perThreadKey = keyCount / threadCount / maps.length;
         System.out.println("perThreadKey " + perThreadKey);
 
         perThreadRepeatedKey = repeatedKeyCount / threadCount;
@@ -46,13 +46,15 @@ public class ByteByteRepeatedTest extends RedissonTest {
             keys[i] = generateByteArray(random, keyLength);
         }
 
-        LocalCachedMapOptions options = LocalCachedMapOptions.defaults()
-                .cacheSize(cacheSize)
-                .evictionPolicy(LocalCachedMapOptions.EvictionPolicy.LRU);
 
         for (int i = 0; i < maps.length; i++) {
             String mapName = mapNames[i];
             if (cacheSize > 0) {
+
+                LocalCachedMapOptions options = LocalCachedMapOptions.defaults()
+                        .cacheSize(cacheSize)
+                        .evictionPolicy(LocalCachedMapOptions.EvictionPolicy.LRU);
+
                 maps[i] = client.getLocalCachedMap(mapName, options);
                 System.out.println(" Map name : " + mapName +
                         " with near cache size  : " + cacheSize +
@@ -97,48 +99,22 @@ public class ByteByteRepeatedTest extends RedissonTest {
         state.base = (state.id / maps.length) * perThreadKey;
         state.currentBase = state.base;
 
-        System.out.println("Thread " + state.map.getName() + ", inverval [" + (state.base + "," + state.base + perThreadKey) + "]");
-    }
-
-    @TimeStep(prob = 0)
-    public byte[] putRepeated(ThreadState state) {
-        byte[] ret = state.map.put(state.randomRepeatedKey(), state.randomValue());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
-
+        System.out.println("Thread " + state.map.getName() + ", inverval [" + (state.base + "," + (state.base + perThreadKey) + "]"));
     }
 
     @TimeStep(prob = 0)
     public byte[] getRepeated(ThreadState state) {
-        byte[] ret = state.map.get(state.randomRepeatedKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.map.get(state.randomRepeatedKey());
     }
 
     @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
-        byte[] ret = state.randomMap().put(state.randomKey(), state.randomValue());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.randomMap().put(state.randomKey(), state.randomValue());
     }
 
     @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
-        byte[] ret = state.randomMap().get(state.randomKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.randomMap().get(state.randomKey());
     }
 
     public class ThreadState extends BaseThreadState {
@@ -184,5 +160,4 @@ public class ByteByteRepeatedTest extends RedissonTest {
             map.deleteAsync();
         }
     }
-
 }
