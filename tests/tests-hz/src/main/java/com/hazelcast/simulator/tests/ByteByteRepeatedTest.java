@@ -160,7 +160,10 @@ public class ByteByteRepeatedTest extends HazelcastTest {
                 System.out.println("Current base : " + currentBase);
             }
 
-            return ((count) % perThreadRepeatedKey) + currentBase;
+            int key = ((count) % perThreadRepeatedKey) + currentBase;
+            System.out.println("Key is " + key);
+
+            return key;
         }
 
         private byte[] randomRepeatedKey() {
@@ -186,8 +189,8 @@ public class ByteByteRepeatedTest extends HazelcastTest {
             NearCacheStats stats = map.getLocalMapStats().getNearCacheStats();
             if (stats != null) {
                 System.out.println("Hits : " + stats.getHits() +
-                        "Misses :  " + stats.getMisses() +
-                        "Hit ratio : " + stats.getRatio());
+                        " Misses :  " + stats.getMisses() +
+                        " Hit ratio : " + stats.getRatio());
             }
         }
     }
