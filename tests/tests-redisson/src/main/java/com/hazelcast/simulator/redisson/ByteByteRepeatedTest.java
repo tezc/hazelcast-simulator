@@ -34,7 +34,7 @@ public class ByteByteRepeatedTest extends RedissonTest {
 
     @Setup
     public void setUp() {
-        perThreadKey = keyCount / threadCount;
+        perThreadKey = keyCount / threadCount /maps.length;
         System.out.println("perThreadKey " + perThreadKey);
 
         perThreadRepeatedKey = repeatedKeyCount / threadCount;
@@ -154,10 +154,11 @@ public class ByteByteRepeatedTest extends RedissonTest {
             count++;
             if (count == perThreadRepeatedKey * 100) {
                 count = 0;
-                currentBase = ((iteration++ * perThreadRepeatedKey) % perThreadKey) + base;
+                iteration++;
+                currentBase = ((iteration * perThreadRepeatedKey) % perThreadKey) + base;
             }
 
-            return ((count) % perThreadRepeatedKey) + currentBase;
+            return ((count/2) % perThreadRepeatedKey) + currentBase;
         }
 
         private byte[] randomRepeatedKey() {
