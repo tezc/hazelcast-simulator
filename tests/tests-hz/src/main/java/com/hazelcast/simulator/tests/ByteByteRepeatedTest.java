@@ -156,6 +156,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
             if (count == perThreadRepeatedKey * 100) {
                 count = 0;
                 currentBase = ((iteration++ * perThreadRepeatedKey) % perThreadKey) + base;
+                System.out.println("Current base : " + currentBase);
             }
 
             return ((count) % perThreadRepeatedKey) + currentBase;
