@@ -104,32 +104,17 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
     @TimeStep(prob = 0)
     public byte[] getRepeated(ThreadState state) {
-        byte[] ret = state.map.get(state.randomRepeatedKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.map.get(state.randomRepeatedKey());
     }
 
     @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
-        byte[] ret = state.randomMap().put(state.randomKey(), state.randomValue());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.randomMap().put(state.randomKey(), state.randomValue());
     }
 
     @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
-        byte[] ret = state.randomMap().get(state.randomKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return state.randomMap().get(state.randomKey());
     }
 
     public class ThreadState extends BaseThreadState {
