@@ -119,6 +119,8 @@ public class ByteByteRepeatedTest extends HazelcastTest {
             throw new RuntimeException("Null return");
         }
 
+        state.map.get(state.randomRepeatedKey());
+
         return ret;
     }
 
@@ -153,7 +155,7 @@ public class ByteByteRepeatedTest extends HazelcastTest {
 
         private int randomRepeated() {
             count++;
-            if (count == perThreadRepeatedKey * 100) {
+            if (count == perThreadRepeatedKey * 50) {
                 count = 0;
                 iteration++;
                 currentBase = ((iteration * perThreadRepeatedKey) % perThreadKey) + base;
