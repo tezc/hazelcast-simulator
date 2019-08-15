@@ -152,7 +152,7 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
                 base = randomInt(keys.length - perThreadRepeatedKey);
             }
 
-            int key = (((value) % perThreadRepeatedKey)/2) + base;
+            int key = ((value) % perThreadRepeatedKey) + base;
             System.out.println("Key is " + key);
 
             return key;
