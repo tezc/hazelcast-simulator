@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.hazelcast.simulator.utils.GeneratorUtils.generateByteArray;
 
-public class ByteByteRepeatedTest2 extends HazelcastTest {
+public class ByteByteRepeatedSingleMapTest extends HazelcastTest {
 
     // properties
     public int keyCount = 1000;
@@ -25,29 +25,29 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
     public int threadCount = 10;
 
 
+    private int perThreadKey;
     private int perThreadRepeatedKey;
     private byte[][] keys;
     private byte[][] values;
 
-    private final IMap<byte[], byte[]>[] maps = new IMap[5];
-    private final String[] mapNames = {"map", "map33", "map3", "map12", "map22"};
+    private IMap<byte[], byte[]> map;
     private final AtomicInteger id = new AtomicInteger();
 
     @Setup
     public void setUp() {
+        perThreadKey = keyCount / threadCount;
+        System.out.println("perThreadKey " + perThreadKey);
+
         perThreadRepeatedKey = repeatedKeyCount / threadCount;
         System.out.println("perThreadRepeatedKey " + perThreadRepeatedKey);
 
         Random random = new Random();
-        keys = new byte[keyCount / maps.length][];
+        keys = new byte[keyCount][];
         for (int i = 0; i < keys.length; i++) {
             keys[i] = generateByteArray(random, keyLength);
         }
 
-        for (int i = 0; i < maps.length; i++) {
-            maps[i] = targetInstance.getMap(mapNames[i]);
-            System.out.println("Map name : " + mapNames[i] + ", map size " + maps[i].size());
-        }
+        map = targetInstance.getMap("map");
     }
 
     @Prepare
@@ -58,24 +58,18 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
             values[i] = generateByteArray(random, valueSize);
         }
 
-        for (IMap<byte[], byte[]> map : maps) {
-            Streamer<byte[], byte[]> streamer = StreamerFactory.getInstance(map);
-            for (byte[] key : keys) {
-                streamer.pushEntry(key, values[random.nextInt(values.length)]);
-            }
-            streamer.await();
+        Streamer<byte[], byte[]> streamer = StreamerFactory.getInstance(map);
+        for (byte[] key : keys) {
+            streamer.pushEntry(key, values[random.nextInt(values.length)]);
         }
+        streamer.await();
 
-        for (IMap<byte[], byte[]> map : maps) {
-            System.out.println("Total map size " + map.size());
-        }
+        System.out.println("Total map size " + map.size());
     }
 
     @Prepare (global = true)
     public void prepareGlobal() {
-        for (IMap<byte[], byte[]> map : maps) {
-            System.out.println("Total map size " + map.size());
-        }
+        System.out.println("Total map size " + map.size());
 
         try {
             Thread.sleep(5000);
@@ -83,62 +77,50 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
             e.printStackTrace();
         }
 
-        for (IMap<byte[], byte[]> map : maps) {
-            System.out.println("Total map size " + map.size());
-        }
+        System.out.println("Total map size " + map.size());
     }
 
     @BeforeRun
     public void beforeRun(ThreadState state) {
         state.id = id.getAndIncrement();
-        state.map = maps[state.id % maps.length];
+        state.base = (state.id) * perThreadKey;
+        state.currentBase = state.base;
+
+        System.out.println("Thread " + map.getName() + ", inverval [" + state.base + "," + (state.base + perThreadKey) + "]");
     }
 
     @TimeStep(prob = 0)
     public byte[] getRepeated(ThreadState state) {
-        byte[] ret = state.map.get(state.randomRepeatedKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return map.get(state.randomRepeatedKey());
     }
 
     @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
-        byte[] ret = state.randomMap().put(state.randomKey(), state.randomValue());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return map.put(state.randomKey(), state.randomValue());
     }
 
     @TimeStep(prob = 0)
     public byte[] get(ThreadState state) {
-        byte[] ret = state.randomMap().get(state.randomKey());
-        if (ret == null) {
-            throw new RuntimeException("Null return");
-        }
-
-        return ret;
+        return map.get(state.randomKey());
     }
 
     public class ThreadState extends BaseThreadState {
-        private IMap<byte[], byte[]> map;
         private int id;
-        private int count;
         private int base;
+        private int currentBase;
+        private int iteration;
+        private int count;
 
 
         private int randomRepeated() {
             count++;
             if (count == perThreadRepeatedKey * 100) {
                 count = 0;
-                base = randomInt(keys.length - perThreadRepeatedKey);
+                iteration++;
+                currentBase = ((iteration * perThreadRepeatedKey) % perThreadKey) + base;
             }
 
-            return ((count / 2) % perThreadRepeatedKey) + base;
+            return ((count/2) % perThreadRepeatedKey) + currentBase;
         }
 
         private byte[] randomRepeatedKey() {
@@ -152,28 +134,20 @@ public class ByteByteRepeatedTest2 extends HazelcastTest {
         private byte[] randomValue() {
             return values[randomInt(values.length)];
         }
-
-        private IMap<byte[], byte[]> randomMap() {
-            return maps[randomInt(maps.length)];
-        }
     }
 
-    @Verify
+    @Verify (global = false)
     public void printStats() {
-        for (IMap map : maps) {
-            NearCacheStats stats = map.getLocalMapStats().getNearCacheStats();
-            if (stats != null) {
-                System.out.println("Hits : " + stats.getHits() +
-                        " Misses :  " + stats.getMisses() +
-                        " Hit ratio : " + stats.getRatio());
-            }
+        NearCacheStats stats = map.getLocalMapStats().getNearCacheStats();
+        if (stats != null) {
+            System.out.println("Hits : " + stats.getHits() +
+                    " Misses :  " + stats.getMisses() +
+                    " Hit ratio : " + stats.getRatio());
         }
     }
 
     @Teardown (global = true)
     public void tearDown() {
-        for (IMap map : maps) {
-            map.destroy();
-        }
+        map.destroy();
     }
 }
