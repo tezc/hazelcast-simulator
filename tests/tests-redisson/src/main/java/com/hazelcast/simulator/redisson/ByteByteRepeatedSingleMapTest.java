@@ -86,7 +86,7 @@ public class ByteByteRepeatedSingleMapTest extends RedissonTest {
 
     @BeforeRun
     public void beforeRun(ThreadState state) {
-        state.id = id.incrementAndGet();
+        state.id = id.getAndIncrement();
         state.base = (state.id) * perThreadKey;
         state.currentBase = state.base;
 
