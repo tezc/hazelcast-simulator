@@ -100,6 +100,11 @@ public class ByteByteRepeatedSingleMapTest extends HazelcastTest {
     }
 
     @TimeStep(prob = 0)
+    public byte[] getRepeated3(ThreadState state) {
+        return map.get(state.randomRepeatedKey3());
+    }
+
+    @TimeStep(prob = 0)
     public byte[] put(ThreadState state) {
         return map.put(state.randomKey(), state.randomValue());
     }
@@ -139,12 +144,27 @@ public class ByteByteRepeatedSingleMapTest extends HazelcastTest {
             return ((count/100) % perThreadRepeatedKey) + currentBase;
         }
 
+        private int randomRepeated3() {
+            count++;
+            if (count == perThreadRepeatedKey * 100) {
+                count = 0;
+                iteration++;
+                currentBase = ((iteration * perThreadRepeatedKey) % perThreadKey) + base;
+            }
+
+            return ((count/10) % perThreadRepeatedKey) + currentBase;
+        }
+
         private byte[] randomRepeatedKey() {
             return keys[randomRepeated()];
         }
 
         private byte[] randomRepeatedKey2() {
             return keys[randomRepeated2()];
+        }
+
+        private byte[] randomRepeatedKey3() {
+            return keys[randomRepeated3()];
         }
 
         private byte[] randomKey() {
